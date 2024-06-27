@@ -1,0 +1,25 @@
+version: '3'
+services:
+  text-embeddings-inference:
+    image: ghcr.io/huggingface/text-embeddings-inference:89-1.2-grpc
+    command: >
+      --model-id BAAI/bge-reranker-large
+      --port 8080
+      --max-concurrent-requests 512
+      --max-batch-tokens 16384
+      --dtype float16
+    env_file:
+      - .env
+    volumes:
+      - ./external-data/model/embedding_model:/data
+    ports:
+      - 8081:8080
+    shm_size: '1gb'
+    restart: always
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
